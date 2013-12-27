@@ -42,6 +42,7 @@ var margin = {top: 20, right: 50, bottom: 30, left: 50},
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = d3.time.format("%H:%M").parse;
+var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
 var x = d3.time.scale()
@@ -52,6 +53,7 @@ var y = d3.time.scale()
 
 var xAxis = d3.svg.axis()
     .scale(x)
+    .tickFormat(formatDate)
     .orient("bottom");
 
 var yAxis = d3.svg.axis()
@@ -67,6 +69,7 @@ var yAxisRight = d3.svg.axis()
     .orient("right");
 
 var line = d3.svg.line()
+    .interpolate("basis") // smooth
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.sunrise); });
 

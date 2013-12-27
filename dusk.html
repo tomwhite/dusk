@@ -49,7 +49,7 @@ var x = d3.time.scale()
     .range([0, width]);
 
 var y = d3.time.scale()
-    .range([height, 0]);    
+    .range([height, 0]);
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -92,7 +92,7 @@ d3.csv("sunrise_and_sunset.csv", function(error, data) {
       return d3.svg.axis()
           .scale(x)
           .orient("bottom")
-          .ticks(d3.time.day, 5)
+          .ticks(d3.time.day, 7) // weekly
   }
   
   function make_y_axis() {        
@@ -107,6 +107,7 @@ d3.csv("sunrise_and_sunset.csv", function(error, data) {
       .attr("transform", "translate(0," + height + ")")
       .call(make_x_axis()
           .tickSize(-height, 0, 0)
+          //.tickFormat(d3.time.format("%e")) // show day of month
           .tickFormat("")
       )
   svg.append("g")         

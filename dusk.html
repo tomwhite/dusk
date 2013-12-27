@@ -42,6 +42,7 @@ var margin = {top: 20, right: 50, bottom: 30, left: 50},
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = d3.time.format("%H:%M").parse;
+var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
 var x = d3.time.scale()
     .range([0, width]);
@@ -56,13 +57,14 @@ var xAxis = d3.svg.axis()
 var yAxis = d3.svg.axis()
     .scale(y)
     .ticks(d3.time.minute, 10)
+    .tickFormat(formatTime)
     .orient("left");
 
 var yAxisRight = d3.svg.axis()
     .scale(y)
     .ticks(d3.time.minute, 10)
+    .tickFormat(formatTime)
     .orient("right");
-
 
 var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
@@ -86,7 +88,8 @@ d3.csv("sunrise_and_sunset.csv", function(error, data) {
   function make_x_axis() {        
       return d3.svg.axis()
           .scale(x)
-           .orient("bottom")
+          .orient("bottom")
+          .ticks(d3.time.day, 5)
   }
   
   function make_y_axis() {        

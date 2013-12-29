@@ -76,13 +76,13 @@ var yAxisRight = d3.svg.axis()
 var line = d3.svg.line()
     .interpolate("basis") // smooth
     .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.sunrise); });
+    .y(function(d) { return y(d.official_sunrise); });
 
 var area = d3.svg.area()
     .interpolate("basis")
     .x(function(d) { return x(d.date); })
     .y0(height)
-    .y1(function(d) { return y(d.sunrise); });
+    .y1(function(d) { return y(d.official_sunrise); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -90,14 +90,17 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("sunrise_and_sunset.csv", function(error, data) {
+d3.tsv("data.tsv", function(error, data) {
   data.forEach(function(d) {
     d.date = parseDate(d.date);
-    d.sunrise = parseTime(d.sunrise);
+    d.official_sunrise = parseTime(d.official_sunrise);
+    d.civil_sunrise = parseTime(d.civil_sunrise);
+    d.nautical_sunrise = parseTime(d.nautical_sunrise);
+    d.astronomical_sunrise = parseTime(d.astronomical_sunrise);
   });
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain(d3.extent(data, function(d) { return d.sunrise; }));
+  y.domain(d3.extent(data, function(d) { return d.official_sunrise; }));
 
   function make_x_axis() {        
       return d3.svg.axis()

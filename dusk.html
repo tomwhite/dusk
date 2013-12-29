@@ -19,8 +19,12 @@ body {
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #666;
   stroke-width: 1.5px;
+}
+
+.area {
+  fill: #e7e7e7;
 }
 
 .grid .tick {
@@ -74,6 +78,12 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.sunrise); });
 
+var area = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d) { return x(d.date); })
+    .y0(height)
+    .y1(function(d) { return y(d.sunrise); });
+
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -102,8 +112,14 @@ d3.csv("sunrise_and_sunset.csv", function(error, data) {
           .orient("left")
           .ticks(d3.time.minute, 5)
   }
-  
-  svg.append("g")         
+
+  // Add the area path.
+  svg.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area);
+
+  svg.append("g")
       .attr("class", "grid")
       .attr("transform", "translate(0," + height + ")")
       .call(make_x_axis()

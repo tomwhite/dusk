@@ -112,7 +112,8 @@ d3.tsv("data.tsv", function(error, data) {
   });
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain(d3.extent(data, function(d) { return d.official_sunrise; }));
+  y.domain([d3.min(data, function(d) { return d.civil_sunrise; }),
+            d3.max(data, function(d) { return d.official_sunrise; })]);
 
   function make_x_axis() {        
       return d3.svg.axis()

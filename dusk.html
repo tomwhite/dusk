@@ -24,7 +24,8 @@ body {
 }
 
 .area {
-  fill: #e7e7e7;
+  fill: #777777;
+  opacity: 0.1;
 }
 
 .grid .tick {
@@ -73,16 +74,27 @@ var yAxisRight = d3.svg.axis()
     .tickFormat(formatTime)
     .orient("right");
 
-var line = d3.svg.line()
+var official_sunrise_line = d3.svg.line()
     .interpolate("basis") // smooth
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.official_sunrise); });
 
-var area = d3.svg.area()
+var civil_sunrise_line = d3.svg.line()
+    .interpolate("basis") // smooth
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.civil_sunrise); });
+
+var official_sunrise_area = d3.svg.area()
     .interpolate("basis")
     .x(function(d) { return x(d.date); })
     .y0(height)
     .y1(function(d) { return y(d.official_sunrise); });
+
+var civil_sunrise_area = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d) { return x(d.date); })
+    .y0(height)
+    .y1(function(d) { return y(d.civil_sunrise); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -120,7 +132,11 @@ d3.tsv("data.tsv", function(error, data) {
   svg.append("path")
       .datum(data)
       .attr("class", "area")
-      .attr("d", area);
+      .attr("d", official_sunrise_area);
+  svg.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", civil_sunrise_area);
 
   svg.append("g")
       .attr("class", "grid")
@@ -153,8 +169,14 @@ d3.tsv("data.tsv", function(error, data) {
   svg.append("path")
       .datum(data)
       .attr("class", "line")
-      .attr("d", line);
-      
+      .attr("d", official_sunrise_line);
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", civil_sunrise_line);
+
+
 });
 
 </script>

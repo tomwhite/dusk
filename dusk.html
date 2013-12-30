@@ -58,19 +58,11 @@ function makeSunLine(sunFunction) {
     .y(sunFunction);
 }
 
-function makeDawnArea(sunFunction) {
+function makeTwilightArea(sunrise, sunFunction) {
   return d3.svg.area()
     .interpolate("basis")
     .x(function(d) { return x(d.date); })
-    .y0(height)
-    .y1(sunFunction);
-}
-
-function makeDuskArea(sunFunction) {
-  return d3.svg.area()
-    .interpolate("basis")
-    .x(function(d) { return x(d.date); })
-    .y0(0)
+    .y0(sunrise ? height : 0)
     .y1(sunFunction);
 }
 
@@ -107,12 +99,12 @@ var lines = [
 ];
 
 var areas = [
-  makeDawnArea(function(d) { return y(d.official_sunrise); }),
-  makeDawnArea(function(d) { return y(d.civil_sunrise); }),
-  makeDawnArea(function(d) { return y(d.nautical_sunrise); }),
-  makeDuskArea(function(d) { return y(d.official_sunset); }),
-  makeDuskArea(function(d) { return y(d.civil_sunset); }),
-  makeDuskArea(function(d) { return y(d.nautical_sunset); })
+  makeTwilightArea(true, function(d) { return y(d.official_sunrise); }),
+  makeTwilightArea(true, function(d) { return y(d.civil_sunrise); }),
+  makeTwilightArea(true, function(d) { return y(d.nautical_sunrise); }),
+  makeTwilightArea(false, function(d) { return y(d.official_sunset); }),
+  makeTwilightArea(false, function(d) { return y(d.civil_sunset); }),
+  makeTwilightArea(false, function(d) { return y(d.nautical_sunset); })
 ];
 
 var svg = d3.select("body").append("svg")

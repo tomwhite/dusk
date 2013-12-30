@@ -51,23 +51,30 @@ var margin = {top: 20, right: 50, bottom: 30, left: 50},
     height = 1200 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
-var parseTime = d3.time.format("%H:%M").parse;
+var parseTime = function(time) {
+  if (time === "99:99") {
+    return null;
+  }
+  return d3.time.format("%H:%M").parse(time);
+}
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
-function makeSunLine(sunFunction) {
+function makeSunLine(accessor) {
   return d3.svg.line()
     .interpolate("basis") // smooth
     .x(function(d) { return x(d.date); })
-    .y(sunFunction);
+    .y(function(d) { return y(accessor.call(undefined, d)); })
+    .defined(function(d) { return accessor.call(undefined, d) != null });
 }
 
-function makeTwilightArea(sunrise, sunFunction) {
+function makeTwilightArea(sunrise, accessor) {
   return d3.svg.area()
     .interpolate("basis")
     .x(function(d) { return x(d.date); })
     .y0(sunrise ? 0 : height)
-    .y1(sunFunction);
+    .y1(function(d) { return y(accessor.call(undefined, d)); })
+    .defined(function(d) { return accessor.call(undefined, d) != null });
 }
 
 var x = d3.time.scale()
@@ -95,21 +102,19 @@ var yAxisRight = d3.svg.axis()
     .orient("right");
 
 var lines = [
-  makeSunLine(function(d) { return y(d.official_sunrise); }),
-  makeSunLine(function(d) { return y(d.civil_sunrise); }),
-  makeSunLine(function(d) { return y(d.nautical_sunrise); }),
-  makeSunLine(function(d) { return y(d.official_sunset); }),
-  makeSunLine(function(d) { return y(d.civil_sunset); }),
-  makeSunLine(function(d) { return y(d.nautical_sunset); })
+  makeSunLine(function(d) { return d.official_sunrise; }),
+  makeSunLine(function(d) { return d.official_sunset; }),
 ];
 
 var areas = [
-  makeTwilightArea(true, function(d) { return y(d.official_sunrise); }),
-  makeTwilightArea(true, function(d) { return y(d.civil_sunrise); }),
-  makeTwilightArea(true, function(d) { return y(d.nautical_sunrise); }),
-  makeTwilightArea(false, function(d) { return y(d.official_sunset); }),
-  makeTwilightArea(false, function(d) { return y(d.civil_sunset); }),
-  makeTwilightArea(false, function(d) { return y(d.nautical_sunset); })
+  makeTwilightArea(true, function(d) { return d.official_sunrise; }),
+  makeTwilightArea(true, function(d) { return d.civil_sunrise; }),
+  makeTwilightArea(true, function(d) { return d.nautical_sunrise; }),
+  makeTwilightArea(true, function(d) { return d.astronomical_sunrise; }),
+  makeTwilightArea(false, function(d) { return d.official_sunset; }),
+  makeTwilightArea(false, function(d) { return d.civil_sunset; }),
+  makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
+  //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
 ];
 
 var svg = d3.select("body").append("svg")

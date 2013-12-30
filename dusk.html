@@ -97,21 +97,23 @@ var yAxisRight = d3.svg.axis()
     .tickFormat(formatTime)
     .orient("right");
 
-var official_sunrise_line = makeSunLine(function(d) { return y(d.official_sunrise); });
-var civil_sunrise_line = makeSunLine(function(d) { return y(d.civil_sunrise); });
-var nautical_sunrise_line = makeSunLine(function(d) { return y(d.nautical_sunrise); });
+var lines = [
+  makeSunLine(function(d) { return y(d.official_sunrise); }),
+  makeSunLine(function(d) { return y(d.civil_sunrise); }),
+  makeSunLine(function(d) { return y(d.nautical_sunrise); }),
+  makeSunLine(function(d) { return y(d.official_sunset); }),
+  makeSunLine(function(d) { return y(d.civil_sunset); }),
+  makeSunLine(function(d) { return y(d.nautical_sunset); })
+];
 
-var official_sunset_line = makeSunLine(function(d) { return y(d.official_sunset); });
-var civil_sunset_line = makeSunLine(function(d) { return y(d.civil_sunset); });
-var nautical_sunset_line = makeSunLine(function(d) { return y(d.nautical_sunset); });
-
-var official_sunrise_area = makeDawnArea(function(d) { return y(d.official_sunrise); });
-var civil_sunrise_area = makeDawnArea(function(d) { return y(d.civil_sunrise); });
-var nautical_sunrise_area = makeDawnArea(function(d) { return y(d.nautical_sunrise); });
-
-var official_sunset_area = makeDuskArea(function(d) { return y(d.official_sunset); });
-var civil_sunset_area = makeDuskArea(function(d) { return y(d.civil_sunset); });
-var nautical_sunset_area = makeDuskArea(function(d) { return y(d.nautical_sunset); });
+var areas = [
+  makeDawnArea(function(d) { return y(d.official_sunrise); }),
+  makeDawnArea(function(d) { return y(d.civil_sunrise); }),
+  makeDawnArea(function(d) { return y(d.nautical_sunrise); }),
+  makeDuskArea(function(d) { return y(d.official_sunset); }),
+  makeDuskArea(function(d) { return y(d.civil_sunset); }),
+  makeDuskArea(function(d) { return y(d.nautical_sunset); })
+];
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -150,31 +152,12 @@ d3.tsv("data.tsv", function(error, data) {
           .ticks(d3.time.minute, 5)
   }
 
-  // Add the area path.
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", official_sunrise_area);
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", civil_sunrise_area);
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", nautical_sunrise_area);
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", official_sunset_area);
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", civil_sunset_area);
-  svg.append("path")
-      .datum(data)
-      .attr("class", "area")
-      .attr("d", nautical_sunset_area);
+  areas.forEach(function(area) {
+      svg.append("path")
+          .datum(data)
+          .attr("class", "area")
+          .attr("d", area);
+  });
 
   svg.append("g")
       .attr("class", "grid")
@@ -204,36 +187,12 @@ d3.tsv("data.tsv", function(error, data) {
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxisRight);
 
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", official_sunrise_line);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", civil_sunrise_line);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", nautical_sunrise_line);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", official_sunset_line);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", civil_sunset_line);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", nautical_sunset_line);
-
+  lines.forEach(function(line) {
+      svg.append("path")
+          .datum(data)
+          .attr("class", "line")
+          .attr("d", line);
+  });
 
 });
 

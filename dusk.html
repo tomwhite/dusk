@@ -29,12 +29,16 @@ body {
 }
 
 .grid .tick {
+    stroke-width: 0.75px;
     stroke: lightgrey;
     opacity: 0.7;
-    font: 8px sans-serif;
+    font: 5px sans-serif;
 }
 .grid path {
       stroke-width: 0;
+}
+.grid text {
+    stroke: #000; // day of month labels
 }
 
 </style>
@@ -75,6 +79,7 @@ var y = d3.time.scale()
 var xAxis = d3.svg.axis()
     .scale(x)
     .tickFormat(formatDate)
+    .tickPadding(10)
     .orient("bottom");
 
 var yAxis = d3.svg.axis()
@@ -156,6 +161,7 @@ d3.tsv("data.tsv", function(error, data) {
       .attr("transform", "translate(0," + height + ")")
       .call(make_x_axis()
           .tickSize(-height, 0, 0)
+          .tickPadding(8)
           .tickFormat(d3.time.format("%e")) // show day of month
       )
   svg.append("g")         

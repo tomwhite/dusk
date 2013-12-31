@@ -46,9 +46,14 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var margin = {top: 20, right: 50, bottom: 30, left: 50},
+var drawSunrise = true;
+var drawSunset = !drawSunrise;
+var showTopXAxis = true;
+var showBottomXAxis = true;
+
+var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 1200 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = function(time) {
@@ -88,6 +93,12 @@ var xAxis = d3.svg.axis()
     .tickFormat(formatDate)
     .tickPadding(10)
     .orient("bottom");
+
+var xAxisTop = d3.svg.axis()
+    .scale(x)
+    .tickFormat(formatDate)
+    .tickPadding(10)
+    .orient("top");
 
 var yAxis = d3.svg.axis()
     .scale(y)
@@ -137,8 +148,17 @@ d3.tsv("data.tsv", function(error, data) {
   });
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
-            d3.max(data, function(d) { return d.nautical_sunset; })]);
+
+  if (drawSunrise && drawSunset) {
+      y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
+                d3.max(data, function(d) { return d.nautical_sunset; })]);
+  } else if (drawSunrise) {
+      y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
+                d3.max(data, function(d) { return d.official_sunrise; })]);
+  } else {
+      y.domain([d3.min(data, function(d) { return d.official_sunset; }),
+                d3.max(data, function(d) { return d.nautical_sunset; })]);
+  }
 
   function make_x_axis() {        
       return d3.svg.axis()
@@ -167,7 +187,7 @@ d3.tsv("data.tsv", function(error, data) {
       .call(make_x_axis()
           .tickSize(-height, 0, 0)
           .tickPadding(8)
-          .tickFormat(d3.time.format("%e")) // show day of month
+          .tickFormat(showBottomXAxis ? d3.time.format("%e") : "") // show day of month
       )
   svg.append("g")         
       .attr("class", "grid")
@@ -176,10 +196,18 @@ d3.tsv("data.tsv", function(error, data) {
           .tickFormat("")
       )
 
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+  if (showBottomXAxis) {
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+  }
+
+  if (showTopXAxis) {
+      svg.append("g")
+          .attr("class", "x axis")
+          .call(xAxisTop);
+  }
 
   svg.append("g")
       .attr("class", "y axis")

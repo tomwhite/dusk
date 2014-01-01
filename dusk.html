@@ -112,21 +112,31 @@ var yAxisRight = d3.svg.axis()
     .tickFormat(formatTime)
     .orient("right");
 
-var lines = [
-  makeSunLine(function(d) { return d.official_sunrise; }),
-  makeSunLine(function(d) { return d.official_sunset; }),
-];
+var lines = [];
+if (drawSunrise) {
+  lines.push(makeSunLine(function(d) { return d.official_sunrise; }));
+}
+if (drawSunset) {
+  lines.push(makeSunLine(function(d) { return d.official_sunset; }));
+}
 
-var areas = [
-  makeTwilightArea(true, function(d) { return d.official_sunrise; }),
-  makeTwilightArea(true, function(d) { return d.civil_sunrise; }),
-  makeTwilightArea(true, function(d) { return d.nautical_sunrise; }),
-  makeTwilightArea(true, function(d) { return d.astronomical_sunrise; }),
-  makeTwilightArea(false, function(d) { return d.official_sunset; }),
-  makeTwilightArea(false, function(d) { return d.civil_sunset; }),
-  makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
-  //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
-];
+var areas = [];
+if (drawSunrise) {
+  areas = areas.concat([
+      makeTwilightArea(true, function(d) { return d.official_sunrise; }),
+      makeTwilightArea(true, function(d) { return d.civil_sunrise; }),
+      makeTwilightArea(true, function(d) { return d.nautical_sunrise; }),
+      makeTwilightArea(true, function(d) { return d.astronomical_sunrise; }),
+  ]);
+}
+if (drawSunset) {
+  areas = areas.concat([
+      makeTwilightArea(false, function(d) { return d.official_sunset; }),
+      makeTwilightArea(false, function(d) { return d.civil_sunset; }),
+      makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
+      //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
+  ]);
+}
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)

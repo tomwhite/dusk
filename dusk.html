@@ -46,12 +46,14 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var single = false;
-var wholeDay = single;
+var singleScale = false; // false to put both sunrise and sunset on one truncated scale
+var sunriseOnly = false; // true to only show sunrise on single scale
+var sunsetOnly = false; // true to only show sunset on single scale
+var wholeDay = singleScale && !sunriseOnly && !sunsetOnly; // true to show midnight to midnight
 
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-    height = (single ? 2 : 1) * 500 - margin.top - margin.bottom; // TODO: improve
+    height = (singleScale ? 2 : 1) * 500 - margin.top - margin.bottom; // TODO: improve
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = function(time) {
@@ -64,7 +66,7 @@ var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 var midday = parseTime("12:00");
 
-if (single) {
+if (singleScale) {
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
@@ -125,7 +127,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
         .tickPadding(10)
         .orient("top");
 
-    var yAxisTickMins = single ? 30 : 10;
+    var yAxisTickMins = wholeDay ? 30 : 10;
 
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -259,8 +261,8 @@ d3.tsv("data.tsv", function(error, data) {
         d.astronomical_sunset = parseTime(d.astronomical_sunset);
     });
 
-    if (single) {
-        draw(svg1, data, true, true, true, true);
+    if (singleScale) {
+        draw(svg1, data, !sunriseOnly, !sunsetOnly, true, true);
     } else {
         draw(svg1, data, true, false, true, false);
         draw(svg2, data, false, true, false, true);

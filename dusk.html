@@ -62,6 +62,7 @@ var parseTime = function(time) {
 }
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
+var midday = parseTime("12:00");
 
 if (single) {
     var svg = d3.select("body").append("svg")
@@ -99,7 +100,11 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
         .x(function(d) { return x(d.date); })
         .y0(sunrise ? 0 : height)
         .y1(function(d) { return y(accessor.call(undefined, d)); })
-        .defined(function(d) { return accessor.call(undefined, d) != null });
+        .defined(function(d) {
+          var time = accessor.call(undefined, d);
+          // only defined if a valid time and in morning for sunrise, afternoon for sunset
+          return time != null && (sunrise ? (time < midday) : (time > midday));
+        });
     }
 
     var x = d3.time.scale()
@@ -154,7 +159,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
           makeTwilightArea(false, function(d) { return d.official_sunset; }),
           makeTwilightArea(false, function(d) { return d.civil_sunset; }),
           makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
-          //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
+          makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
       ]);
     }
 

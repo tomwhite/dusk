@@ -46,6 +46,9 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
+var single = false;
+var wholeDay = single;
+
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -60,13 +63,25 @@ var parseTime = function(time) {
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom);
-
-var svg1 = svg
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+if (single) {
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+    var svg1 = svg
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+} else {
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", 2 * (height + margin.top + margin.bottom));
+    var svg1 = svg
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var svg2 = svg
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + (height + 2 * margin.top
+        + margin.bottom) + ")");
+}
 
 function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
 
@@ -145,7 +160,9 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
 
     x.domain(d3.extent(data, function(d) { return d.date; }));
 
-    if (drawSunrise && drawSunset) {
+    if (wholeDay) {
+      y.domain([parseTime("00:00"), parseTime("24:00")]);
+    } else if (drawSunrise && drawSunset) {
       y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
                 d3.max(data, function(d) { return d.nautical_sunset; })]);
     } else if (drawSunrise) {
@@ -235,7 +252,12 @@ d3.tsv("data.tsv", function(error, data) {
         d.astronomical_sunset = parseTime(d.astronomical_sunset);
     });
 
-    draw(svg1, data, true, false, true, true);
+    if (single) {
+        draw(svg1, data, true, true, true, true);
+    } else {
+        draw(svg1, data, true, false, true, false);
+        draw(svg2, data, false, true, false, true);
+    }
 });
 
 </script>

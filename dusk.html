@@ -46,11 +46,6 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var drawSunrise = true;
-var drawSunset = !drawSunrise;
-var showTopXAxis = true;
-var showBottomXAxis = true;
-
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -112,86 +107,75 @@ var yAxisRight = d3.svg.axis()
     .tickFormat(formatTime)
     .orient("right");
 
-var lines = [];
-if (drawSunrise) {
-  lines.push(makeSunLine(function(d) { return d.official_sunrise; }));
-}
-if (drawSunset) {
-  lines.push(makeSunLine(function(d) { return d.official_sunset; }));
-}
-
-var areas = [];
-if (drawSunrise) {
-  areas = areas.concat([
-      makeTwilightArea(true, function(d) { return d.official_sunrise; }),
-      makeTwilightArea(true, function(d) { return d.civil_sunrise; }),
-      makeTwilightArea(true, function(d) { return d.nautical_sunrise; }),
-      makeTwilightArea(true, function(d) { return d.astronomical_sunrise; }),
-  ]);
-}
-if (drawSunset) {
-  areas = areas.concat([
-      makeTwilightArea(false, function(d) { return d.official_sunset; }),
-      makeTwilightArea(false, function(d) { return d.civil_sunset; }),
-      makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
-      //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
-  ]);
-}
-
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("data.tsv", function(error, data) {
-  data.forEach(function(d) {
-    d.date = parseDate(d.date);
-    d.official_sunrise = parseTime(d.official_sunrise);
-    d.civil_sunrise = parseTime(d.civil_sunrise);
-    d.nautical_sunrise = parseTime(d.nautical_sunrise);
-    d.astronomical_sunrise = parseTime(d.astronomical_sunrise);
-    d.official_sunset = parseTime(d.official_sunset);
-    d.civil_sunset = parseTime(d.civil_sunset);
-    d.nautical_sunset = parseTime(d.nautical_sunset);
-    d.astronomical_sunset = parseTime(d.astronomical_sunset);
-  });
+function draw(data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
+    var lines = [];
+    if (drawSunrise) {
+      lines.push(makeSunLine(function(d) { return d.official_sunrise; }));
+    }
+    if (drawSunset) {
+      lines.push(makeSunLine(function(d) { return d.official_sunset; }));
+    }
 
-  if (drawSunrise && drawSunset) {
+    var areas = [];
+    if (drawSunrise) {
+      areas = areas.concat([
+          makeTwilightArea(true, function(d) { return d.official_sunrise; }),
+          makeTwilightArea(true, function(d) { return d.civil_sunrise; }),
+          makeTwilightArea(true, function(d) { return d.nautical_sunrise; }),
+          makeTwilightArea(true, function(d) { return d.astronomical_sunrise; }),
+      ]);
+    }
+    if (drawSunset) {
+      areas = areas.concat([
+          makeTwilightArea(false, function(d) { return d.official_sunset; }),
+          makeTwilightArea(false, function(d) { return d.civil_sunset; }),
+          makeTwilightArea(false, function(d) { return d.nautical_sunset; }),
+          //makeTwilightArea(false, function(d) { return d.astronomical_sunset; }),
+      ]);
+    }
+
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+
+    if (drawSunrise && drawSunset) {
       y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
                 d3.max(data, function(d) { return d.nautical_sunset; })]);
-  } else if (drawSunrise) {
+    } else if (drawSunrise) {
       y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
                 d3.max(data, function(d) { return d.official_sunrise; })]);
-  } else {
+    } else {
       y.domain([d3.min(data, function(d) { return d.official_sunset; }),
                 d3.max(data, function(d) { return d.nautical_sunset; })]);
-  }
+    }
 
-  function make_x_axis() {        
+    function make_x_axis() {
       return d3.svg.axis()
           .scale(x)
           .orient("bottom")
           .ticks(d3.time.day, 7) // weekly
-  }
-  
-  function make_y_axis() {        
+    }
+
+    function make_y_axis() {
       return d3.svg.axis()
           .scale(y)
           .orient("left")
           .ticks(d3.time.minute, 5)
-  }
+    }
 
-  areas.forEach(function(area) {
+    areas.forEach(function(area) {
       svg.append("path")
           .datum(data)
           .attr("class", "area")
           .attr("d", area);
-  });
+    });
 
-  svg.append("g")
+    svg.append("g")
       .attr("class", "grid")
       .attr("transform", "translate(0," + height + ")")
       .call(make_x_axis()
@@ -199,42 +183,57 @@ d3.tsv("data.tsv", function(error, data) {
           .tickPadding(8)
           .tickFormat(showBottomXAxis ? d3.time.format("%e") : "") // show day of month
       )
-  svg.append("g")         
+    svg.append("g")
       .attr("class", "grid")
       .call(make_y_axis()
           .tickSize(-width, 0, 0)
           .tickFormat("")
       )
 
-  if (showBottomXAxis) {
+    if (showBottomXAxis) {
       svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
           .call(xAxis);
-  }
+    }
 
-  if (showTopXAxis) {
+    if (showTopXAxis) {
       svg.append("g")
           .attr("class", "x axis")
           .call(xAxisTop);
-  }
+    }
 
-  svg.append("g")
+    svg.append("g")
       .attr("class", "y axis")
       .call(yAxis);
 
-  svg.append("g")
+    svg.append("g")
       .attr("class", "y axis")
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxisRight);
 
-  lines.forEach(function(line) {
+    lines.forEach(function(line) {
       svg.append("path")
           .datum(data)
           .attr("class", "line")
           .attr("d", line);
-  });
+    });
+}
 
+d3.tsv("data.tsv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.official_sunrise = parseTime(d.official_sunrise);
+        d.civil_sunrise = parseTime(d.civil_sunrise);
+        d.nautical_sunrise = parseTime(d.nautical_sunrise);
+        d.astronomical_sunrise = parseTime(d.astronomical_sunrise);
+        d.official_sunset = parseTime(d.official_sunset);
+        d.civil_sunset = parseTime(d.civil_sunset);
+        d.nautical_sunset = parseTime(d.nautical_sunset);
+        d.astronomical_sunset = parseTime(d.astronomical_sunset);
+    });
+
+    draw(data, true, false, true, true);
 });
 
 </script>

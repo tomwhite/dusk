@@ -222,13 +222,19 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
       svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+          .call(xAxis)
+          .selectAll("text")
+            .attr("x", 2)
+            .attr("style", null);
     }
 
     if (showTopXAxis) {
       svg.append("g")
           .attr("class", "x axis")
-          .call(xAxisTop);
+          .call(xAxisTop)
+          .selectAll("text")
+            .attr("x", 2)
+            .attr("style", null);
     }
 
     svg.append("g")

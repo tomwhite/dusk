@@ -70,26 +70,6 @@ var formatDayOfMonth = function(d) {
 
 var midday = parseTime("12:00");
 
-if (singleScale) {
-    var svg = d3.select("body").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom);
-    var svg1 = svg
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-} else {
-    var svg = d3.select("body").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", 2 * (height + margin.top + margin.bottom));
-    var svg1 = svg
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var svg2 = svg
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + (height + 2 * margin.top
-        + margin.bottom) + ")");
-}
-
 function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
 
     function makeSunLine(accessor) {
@@ -270,13 +250,33 @@ d3.tsv("data.tsv", function(error, data) {
         d.nautical_sunset = parseTime(d.nautical_sunset);
         d.astronomical_sunset = parseTime(d.astronomical_sunset);
     });
-
+    
     if (singleScale) {
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+        var svg1 = svg
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         draw(svg1, data, !sunriseOnly, !sunsetOnly, true, true);
     } else {
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", 2 * (height + margin.top + margin.bottom));
+        var svg1 = svg
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var svg2 = svg
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + (height + 2 * margin.top
+            + margin.bottom) + ")");
+
+        // TODO: pass heights in to draw function (may be different)
         draw(svg1, data, true, false, true, false);
         draw(svg2, data, false, true, false, true);
     }
+
 });
 
 </script>

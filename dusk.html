@@ -105,7 +105,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
         .interpolate("basis")
         .x(function(d) { return x(d.date); })
         .y0(sunrise ? 0 : height)
-        .y1(function(d) { return y(accessor.call(undefined, d)); })
+        .y1(function(d) { return Math.min(Math.max(0, y(accessor.call(undefined, d))), height); }) // limit to (0, height)
         .defined(function(d) {
           var time = accessor.call(undefined, d);
           // only defined if a valid time and in morning for sunrise, afternoon for sunset

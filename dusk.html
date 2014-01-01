@@ -60,9 +60,11 @@ var parseTime = function(time) {
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
-var svg1 = d3.select("body").append("svg")
+var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("height", height + margin.top + margin.bottom);
+
+var svg1 = svg
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

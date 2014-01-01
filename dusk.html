@@ -51,7 +51,7 @@ var wholeDay = single;
 
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = (single ? 2 : 1) * 500 - margin.top - margin.bottom; // TODO: improve
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = function(time) {
@@ -125,15 +125,17 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
         .tickPadding(10)
         .orient("top");
 
+    var yAxisTickMins = single ? 30 : 10;
+
     var yAxis = d3.svg.axis()
         .scale(y)
-        .ticks(d3.time.minute, 10)
+        .ticks(d3.time.minute, yAxisTickMins)
         .tickFormat(formatTime)
         .orient("left");
 
     var yAxisRight = d3.svg.axis()
         .scale(y)
-        .ticks(d3.time.minute, 10)
+        .ticks(d3.time.minute, yAxisTickMins)
         .tickFormat(formatTime)
         .orient("right");
 
@@ -168,14 +170,14 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
     if (wholeDay) {
       y.domain([parseTime("00:00"), parseTime("24:00")]);
     } else if (drawSunrise && drawSunset) {
-      y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
-                d3.max(data, function(d) { return d.nautical_sunset; })]);
+      y.domain([d3.min(data, function(d) { return d.civil_sunrise; }),
+                d3.max(data, function(d) { return d.civil_sunset; })]);
     } else if (drawSunrise) {
-      y.domain([d3.min(data, function(d) { return d.nautical_sunrise; }),
+      y.domain([d3.min(data, function(d) { return d.civil_sunrise; }),
                 d3.max(data, function(d) { return d.official_sunrise; })]);
     } else {
       y.domain([d3.min(data, function(d) { return d.official_sunset; }),
-                d3.max(data, function(d) { return d.nautical_sunset; })]);
+                d3.max(data, function(d) { return d.civil_sunset; })]);
     }
 
     function make_x_axis() {

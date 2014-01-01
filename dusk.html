@@ -53,7 +53,7 @@ var wholeDay = singleScale && !sunriseOnly && !sunsetOnly; // true to show midni
 
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-    height = (singleScale ? 2 : 1) * 500 - margin.top - margin.bottom; // TODO: improve
+    height = 1000 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = function(time) {
@@ -70,7 +70,7 @@ var formatDayOfMonth = function(d) {
 
 var midday = parseTime("12:00");
 
-function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
+function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
 
     function makeSunLine(accessor) {
       return d3.svg.line()
@@ -84,8 +84,8 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
       return d3.svg.area()
         .interpolate("basis")
         .x(function(d) { return x(d.date); })
-        .y0(sunrise ? 0 : height)
-        .y1(function(d) { return Math.min(Math.max(0, y(accessor.call(undefined, d))), height); }) // limit to (0, height)
+        .y0(sunrise ? 0 : chartHeight)
+        .y1(function(d) { return Math.min(Math.max(0, y(accessor.call(undefined, d))), chartHeight); }) // limit to (0, chartHeight)
         .defined(function(d) {
           var time = accessor.call(undefined, d);
           // only defined if a valid time and in morning for sunrise, afternoon for sunset
@@ -97,7 +97,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
         .range([0, width]);
 
     var y = d3.time.scale()
-        .range([0, height]);
+        .range([0, chartHeight]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -189,9 +189,9 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
 
     svg.append("g")
       .attr("class", "grid")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + chartHeight + ")")
       .call(make_x_axis()
-          .tickSize(-height, 0, 0)
+          .tickSize(-chartHeight, 0, 0)
           .tickPadding(8)
           .tickFormat(showBottomXAxis ? formatDayOfMonth : "") // show day of month
       )
@@ -205,7 +205,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
     if (showBottomXAxis) {
       svg.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
+          .attr("transform", "translate(0," + chartHeight + ")")
           .call(xAxis)
           .selectAll("text")
             .attr("x", -1)
@@ -251,30 +251,35 @@ d3.tsv("data.tsv", function(error, data) {
         d.astronomical_sunset = parseTime(d.astronomical_sunset);
     });
     
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
     if (singleScale) {
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom);
         var svg1 = svg
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        draw(svg1, data, !sunriseOnly, !sunsetOnly, true, true);
+        draw(svg1, height, data, !sunriseOnly, !sunsetOnly, true, true);
     } else {
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", 2 * (height + margin.top + margin.bottom));
+        var sunriseRange =
+                d3.max(data, function(d) { return d.official_sunrise; }).getTime() - 
+                d3.min(data, function(d) { return d.civil_sunrise; }).getTime();
+
+        var sunsetRange = 
+                d3.max(data, function(d) { return d.civil_sunset; }).getTime() - 
+                d3.min(data, function(d) { return d.official_sunset; }).getTime();
+
+        var svg1Height = (height - margin.top) * sunriseRange / (sunriseRange + sunsetRange);
+        var svg2Height = (height - margin.top) * sunsetRange / (sunriseRange + sunsetRange);
+
         var svg1 = svg
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         var svg2 = svg
           .append("g")
-            .attr("transform", "translate(" + margin.left + "," + (height + 2 * margin.top
-            + margin.bottom) + ")");
+            .attr("transform", "translate(" + margin.left + "," + (svg1Height + 2 * margin.top) + ")");
 
-        // TODO: pass heights in to draw function (may be different)
-        draw(svg1, data, true, false, true, false);
-        draw(svg2, data, false, true, false, true);
+        draw(svg1, svg1Height, data, true, false, true, false);
+        draw(svg2, svg2Height, data, false, true, false, true);
     }
 
 });

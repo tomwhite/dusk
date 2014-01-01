@@ -32,13 +32,13 @@ body {
     stroke-width: 0.75px;
     stroke: lightgrey;
     opacity: 0.7;
-    font: 5px sans-serif;
 }
 .grid path {
       stroke-width: 0;
 }
 .grid text {
-    stroke: #000; // day of month labels
+    font: 8px sans-serif;
+    stroke: none; // day of month labels
 }
 
 </style>
@@ -64,6 +64,10 @@ var parseTime = function(time) {
 }
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
+var formatDayOfMonth = function(d) {
+  return (d.getMonth() == 0) ? d3.time.format("%e").call(undefined, d) : "";
+}
+
 var midday = parseTime("12:00");
 
 if (singleScale) {
@@ -209,7 +213,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
       .call(make_x_axis()
           .tickSize(-height, 0, 0)
           .tickPadding(8)
-          .tickFormat(showBottomXAxis ? d3.time.format("%e") : "") // show day of month
+          .tickFormat(showBottomXAxis ? formatDayOfMonth : "") // show day of month
       )
     svg.append("g")
       .attr("class", "grid")
@@ -224,7 +228,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
           .attr("transform", "translate(0," + height + ")")
           .call(xAxis)
           .selectAll("text")
-            .attr("x", 1)
+            .attr("x", -1)
             .attr("style", null);
     }
 
@@ -233,7 +237,7 @@ function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis)
           .attr("class", "x axis")
           .call(xAxisTop)
           .selectAll("text")
-            .attr("x", 1)
+            .attr("x", -1)
             .attr("style", null);
     }
 

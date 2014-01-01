@@ -60,60 +60,60 @@ var parseTime = function(time) {
 var formatDate = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 
-function makeSunLine(accessor) {
-  return d3.svg.line()
-    .interpolate("basis") // smooth
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(accessor.call(undefined, d)); })
-    .defined(function(d) { return accessor.call(undefined, d) != null });
-}
-
-function makeTwilightArea(sunrise, accessor) {
-  return d3.svg.area()
-    .interpolate("basis")
-    .x(function(d) { return x(d.date); })
-    .y0(sunrise ? 0 : height)
-    .y1(function(d) { return y(accessor.call(undefined, d)); })
-    .defined(function(d) { return accessor.call(undefined, d) != null });
-}
-
-var x = d3.time.scale()
-    .range([0, width]);
-
-var y = d3.time.scale()
-    .range([0, height]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .tickFormat(formatDate)
-    .tickPadding(10)
-    .orient("bottom");
-
-var xAxisTop = d3.svg.axis()
-    .scale(x)
-    .tickFormat(formatDate)
-    .tickPadding(10)
-    .orient("top");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .ticks(d3.time.minute, 10)
-    .tickFormat(formatTime)
-    .orient("left");
-
-var yAxisRight = d3.svg.axis()
-    .scale(y)
-    .ticks(d3.time.minute, 10)
-    .tickFormat(formatTime)
-    .orient("right");
-
-var svg = d3.select("body").append("svg")
+var svg1 = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function draw(data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
+function draw(svg, data, drawSunrise, drawSunset, showTopXAxis, showBottomXAxis) {
+
+    function makeSunLine(accessor) {
+      return d3.svg.line()
+        .interpolate("basis") // smooth
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(accessor.call(undefined, d)); })
+        .defined(function(d) { return accessor.call(undefined, d) != null });
+    }
+
+    function makeTwilightArea(sunrise, accessor) {
+      return d3.svg.area()
+        .interpolate("basis")
+        .x(function(d) { return x(d.date); })
+        .y0(sunrise ? 0 : height)
+        .y1(function(d) { return y(accessor.call(undefined, d)); })
+        .defined(function(d) { return accessor.call(undefined, d) != null });
+    }
+
+    var x = d3.time.scale()
+        .range([0, width]);
+
+    var y = d3.time.scale()
+        .range([0, height]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .tickFormat(formatDate)
+        .tickPadding(10)
+        .orient("bottom");
+
+    var xAxisTop = d3.svg.axis()
+        .scale(x)
+        .tickFormat(formatDate)
+        .tickPadding(10)
+        .orient("top");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .ticks(d3.time.minute, 10)
+        .tickFormat(formatTime)
+        .orient("left");
+
+    var yAxisRight = d3.svg.axis()
+        .scale(y)
+        .ticks(d3.time.minute, 10)
+        .tickFormat(formatTime)
+        .orient("right");
 
     var lines = [];
     if (drawSunrise) {
@@ -233,7 +233,7 @@ d3.tsv("data.tsv", function(error, data) {
         d.astronomical_sunset = parseTime(d.astronomical_sunset);
     });
 
-    draw(data, true, false, true, true);
+    draw(svg1, data, true, false, true, true);
 });
 
 </script>

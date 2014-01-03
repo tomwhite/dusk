@@ -41,12 +41,18 @@ body {
     stroke: none; // day of month labels
 }
 
+.solstice {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1.5px;
+}
+
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var singleScale = false; // false to put both sunrise and sunset on one truncated scale
+var singleScale = true; // false to put both sunrise and sunset on one truncated scale
 var sunriseOnly = false; // true to only show sunrise on single scale
 var sunsetOnly = false; // true to only show sunset on single scale
 var wholeDay = singleScale && !sunriseOnly && !sunsetOnly; // true to show midnight to midnight
@@ -62,11 +68,13 @@ var parseTime = function(time) {
   }
   return d3.time.format("%H:%M").parse(time);
 }
-var formatDate = d3.time.format("%B");
+var formatMonth = d3.time.format("%B");
 var formatTime = d3.time.format("%_H:%M"); // space-pad hour
 var formatDayOfMonth = function(d) {
   return (d.getMonth() == 0) ? d3.time.format("%e").call(undefined, d) : "";
 }
+var formatDate = d3.time.format("%d/%m/%y");
+var formatDateMonth = d3.time.format("%B %d");
 
 var midday = parseTime("12:00");
 
@@ -101,13 +109,13 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
 
     var xAxis = d3.svg.axis()
         .scale(x)
-        .tickFormat(formatDate)
+        .tickFormat(formatMonth)
         .tickPadding(10)
         .orient("bottom");
 
     var xAxisTop = d3.svg.axis()
         .scale(x)
-        .tickFormat(formatDate)
+        .tickFormat(formatMonth)
         .tickPadding(10)
         .orient("top");
 
@@ -238,6 +246,35 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       .attr("class", "y axis")
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxisRight);
+    
+    var summerSolstice = data.filter(function(d) { return formatDate.call(undefined, d.date) === "21/06/14"; })[0];
+    var winterSolstice = data.filter(function(d) { return formatDate.call(undefined, d.date) === "21/12/14"; })[0];
+    
+    svg.append("svg:line")
+      .attr("class", "solstice")
+      .attr("x1", x(summerSolstice.date))
+      .attr("y1", 0)
+      .attr("x2", x(summerSolstice.date))
+      .attr("y2", chartHeight);
+    svg.append("text")
+      .attr("transform", "translate(" + (x(summerSolstice.date) + 5) + "," + (y(summerSolstice.official_sunrise) + 5) + ") rotate(-90)")
+      .attr("dy", ".71em")
+      .attr("text-anchor", "end")  
+      .style("font-size", "10px")
+      .text("Longest day " + formatDateMonth.call(undefined, summerSolstice.date));
+            
+    svg.append("svg:line")
+     .attr("class", "solstice")
+     .attr("x1", x(winterSolstice.date))
+      .attr("y1", 0)
+      .attr("x2", x(winterSolstice.date))
+      .attr("y2", chartHeight);
+      svg.append("text")
+        .attr("transform", "translate(" + (x(winterSolstice.date) + 5) + "," + (y(winterSolstice.official_sunrise) + 5) + ") rotate(-90)")
+        .attr("dy", ".71em")
+        .attr("text-anchor", "end")  
+        .style("font-size", "10px")
+        .text("Shortest day " + formatDateMonth.call(undefined, winterSolstice.date));
 
     lines.forEach(function(line) {
       svg.append("path")

@@ -245,6 +245,24 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
           .attr("class", "line")
           .attr("d", line);
     });
+    
+    if (showTopXAxis) {
+      svg.append("text")
+            .attr("x", width - 5)             
+            .attr("y", margin.top)
+            .attr("text-anchor", "end")  
+            .style("font-size", "16px")
+            .text("Sunrise and sunset times, Crickhowell, 2014");
+    }
+    
+    if (showBottomXAxis) {
+      svg.append("text")
+            .attr("x", width - 5)             
+            .attr("y", chartHeight - 5)
+            .attr("text-anchor", "end")  
+            .style("font-size", "16px")
+            .text("(C) Copyright, Tom White, 2014");
+    }
 }
 
 d3.tsv("data.tsv", function(error, data) {

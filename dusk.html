@@ -221,9 +221,18 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
             .attr("style", null);
     }
 
-    svg.append("g")
+    var yAxisSvg = svg.append("g")
       .attr("class", "y axis")
       .call(yAxis);
+      
+    if (showTopXAxis) {
+      yAxisSvg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Time of day");
+    }
 
     svg.append("g")
       .attr("class", "y axis")

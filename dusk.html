@@ -63,7 +63,7 @@ var margin = {top: 30, right: 50, bottom: 30, left: 50},
 
 var parseDate = d3.time.format("%d/%m/%y").parse;
 var parseTime = function(time) {
-  if (time === "99:99") {
+  if (time === "99:99" || time === "//://" || time === "==:==" || time === "  :  ") {
     return null;
   }
   return d3.time.format("%H:%M").parse(time);

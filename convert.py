@@ -9,25 +9,25 @@ civil_times = []
 nautical_times = []
 astronomical_times = []
 
-with open("crick_official.html") as f:
+with open("target/data/official.html") as f:
   for line in f:
     m = p.match(line)
     if m and len(official_times) < int(m.group(1)):
       official_times.append(m.groups()[1:])
 
-with open("crick_civil.html") as f:
+with open("target/data/civil.html") as f:
   for line in f:
     m = p.match(line)
     if m and len(civil_times) < int(m.group(1)):
       civil_times.append(m.groups()[1:])
 
-with open("crick_nautical.html") as f:
+with open("target/data/nautical.html") as f:
   for line in f:
     m = p.match(line)
     if m and len(nautical_times) < int(m.group(1)):
       nautical_times.append(m.groups()[1:])
 
-with open("crick_astronomical.html") as f:
+with open("target/data/astronomical.html") as f:
   for line in f:
     m = p.match(line)
     if m and len(astronomical_times) < int(m.group(1)):

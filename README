@@ -1,0 +1,17 @@
+To run:
+
+mvn -q exec:java -Dexec.mainClass=com.tom_e_white.dusk.Dusk > data.tsv
+
+or
+
+./fetch_crick.sh
+python convert.py > target/data/crick.tsv
+cp  target/data/crick.tsv data.tsv
+
+./fetch_sf.sh
+python convert.py > target/data/sf.tsv
+cp  target/data/sf.tsv data.tsv
+
+Run a local server:
+
+python -m SimpleHTTPServer

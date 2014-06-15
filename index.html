@@ -72,7 +72,7 @@ var parseTime = function(time) {
   }
   return d3.time.format("%H:%M").parse(time);
 }
-var formatMonth = d3.time.format("%B");
+var formatMonth = d3.time.format("%b"); // abbreviated month name
 var formatTime = function(d) {
   return (d.getMinutes() == 0) ? d3.time.format("%_H:%M").call(undefined, d) : ""; // space-pad hour
 }
@@ -80,7 +80,7 @@ var formatDayOfMonth = function(d) {
   return (d.getMonth() == 0) ? d3.time.format("%e").call(undefined, d) : "";
 }
 var formatDate = d3.time.format("%d/%m/%y");
-var formatDateMonth = d3.time.format("%B %d");
+var formatDateMonth = d3.time.format("%b %d");
 
 var midday = parseTime("12:00");
 

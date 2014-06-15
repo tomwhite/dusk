@@ -10,6 +10,7 @@ body {
 .axis line {
   fill: none;
   stroke: #000;
+  stroke-width: 2px;
   shape-rendering: crispEdges;
 }
 
@@ -30,12 +31,6 @@ body {
 
 .sunArea {
   fill: #FFFFFF;
-}
-
-.axis line {
-  fill: none;
-  stroke: #000;
-  stroke-width: 2px;
 }
 
 .grid .tick {
@@ -65,6 +60,7 @@ var singleScale = false; // false to put both sunrise and sunset on one truncate
 var sunriseOnly = false; // true to only show sunrise on single scale
 var sunsetOnly = false; // true to only show sunset on single scale
 var wholeDay = singleScale && !sunriseOnly && !sunsetOnly; // true to show midnight to midnight
+var showDayOfMonth = false;
 
 var margin = {top: 30, right: 50, bottom: 30, left: 50},
     width = 1287 - margin.left - margin.right,
@@ -229,7 +225,7 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       .call(make_x_axis()
           .tickSize(-chartHeight, 0, 0)
           .tickPadding(8)
-          .tickFormat(showBottomXAxis ? formatDayOfMonth : "") // show day of month
+          .tickFormat(showBottomXAxis && showDayOfMonth ? formatDayOfMonth : "") // show day of month
       )
     svg.append("g")
       .attr("class", "grid")
@@ -295,8 +291,7 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
     svg.append("text")
       .attr("transform", "translate(" + (x(summerSolstice.date) + 5) + "," + (y(summerSolstice.official_sunrise) + 5) + ") rotate(-90)")
       .attr("dy", ".71em")
-      .attr("text-anchor", "end")  
-      .style("font-size", "10px")
+      .attr("text-anchor", "end")
       .text("Longest day " + formatDateMonth.call(undefined, summerSolstice.date));
             
     svg.append("svg:line")
@@ -305,12 +300,11 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       .attr("y1", 0)
       .attr("x2", x(winterSolstice.date))
       .attr("y2", chartHeight);
-      svg.append("text")
-        .attr("transform", "translate(" + (x(winterSolstice.date) + 5) + "," + (y(winterSolstice.official_sunrise) + 5) + ") rotate(-90)")
-        .attr("dy", ".71em")
-        .attr("text-anchor", "end")  
-        .style("font-size", "10px")
-        .text("Shortest day " + formatDateMonth.call(undefined, winterSolstice.date));
+    svg.append("text")
+      .attr("transform", "translate(" + (x(winterSolstice.date) + 5) + "," + (y(winterSolstice.official_sunrise) + 5) + ") rotate(-90)")
+      .attr("dy", ".71em")
+      .attr("text-anchor", "end")
+      .text("Shortest day " + formatDateMonth.call(undefined, winterSolstice.date));
 
     lines.forEach(function(line) {
       svg.append("path")
@@ -319,23 +313,23 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
           .attr("d", line);
     });
     
-    if (showTopXAxis) {
-      svg.append("text")
-            .attr("x", width - 5)             
-            .attr("y", margin.top)
-            .attr("text-anchor", "end")  
-            .style("font-size", "16px")
-            .text("Sunrise and sunset times, Crickhowell, 2014");
-    }
-    
-    if (showBottomXAxis) {
-      svg.append("text")
-            .attr("x", width - 5)             
-            .attr("y", chartHeight - 5)
-            .attr("text-anchor", "end")  
-            .style("font-size", "10px")
-            .text("(C) Copyright, Tom White, 2014");
-    }
+    // if (showTopXAxis) {
+    //   svg.append("text")
+    //         .attr("x", width - 5)             
+    //         .attr("y", margin.top)
+    //         .attr("text-anchor", "end")  
+    //         .style("font-size", "16px")
+    //         .text("Sunrise and sunset times, Crickhowell, 2014");
+    // }
+    // 
+    // if (showBottomXAxis) {
+    //   svg.append("text")
+    //         .attr("x", width - 5)             
+    //         .attr("y", chartHeight - 5)
+    //         .attr("text-anchor", "end")  
+    //         .style("font-size", "10px")
+    //         .text("(C) Copyright, Tom White, 2014");
+    // }
 }
 
 d3.tsv("data.tsv", function(error, data) {

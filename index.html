@@ -52,7 +52,7 @@ body {
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
-var singleScale = true; // false to put both sunrise and sunset on one truncated scale
+var singleScale = false; // false to put both sunrise and sunset on one truncated scale
 var sunriseOnly = false; // true to only show sunrise on single scale
 var sunsetOnly = false; // true to only show sunset on single scale
 var wholeDay = singleScale && !sunriseOnly && !sunsetOnly; // true to show midnight to midnight
@@ -69,7 +69,9 @@ var parseTime = function(time) {
   return d3.time.format("%H:%M").parse(time);
 }
 var formatMonth = d3.time.format("%B");
-var formatTime = d3.time.format("%_H:%M"); // space-pad hour
+var formatTime = function(d) {
+  return (d.getMinutes() == 0) ? d3.time.format("%_H:%M").call(undefined, d) : ""; // space-pad hour
+}
 var formatDayOfMonth = function(d) {
   return (d.getMonth() == 0) ? d3.time.format("%e").call(undefined, d) : "";
 }
@@ -185,7 +187,7 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       return d3.svg.axis()
           .scale(y)
           .orient("left")
-          .ticks(d3.time.minute, 5)
+          .ticks(d3.time.minute, 10) // minutes
     }
 
     areas.forEach(function(area) {

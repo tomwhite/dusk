@@ -28,6 +28,10 @@ body {
   opacity: 0.1;
 }
 
+.sunArea {
+  fill: #FFFFFF;
+}
+
 .grid .tick {
     stroke-width: 0.75px;
     stroke: #c3c3c3;
@@ -90,6 +94,19 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
         .defined(function(d) { return accessor.call(undefined, d) != null });
     }
 
+    function makeSunArea(sunrise, accessor) {
+      return d3.svg.area()
+        .interpolate("basis") // smooth
+        .x(function(d) { return x(d.date); })
+        .y0(function(d) { return Math.min(Math.max(0, y(accessor.call(undefined, d))), chartHeight); }) // limit to (0, chartHeight)
+        .y1(sunrise ? chartHeight + 1 : -1) // extra 1 to eliminate stray line
+        .defined(function(d) {
+          var time = accessor.call(undefined, d);
+          // only defined if a valid time and in morning for sunrise, afternoon for sunset
+          return time != null && (sunrise ? (time < midday) : (time > midday));
+        });
+    }
+
     function makeTwilightArea(sunrise, accessor) {
       return d3.svg.area()
         .interpolate("basis")
@@ -136,11 +153,14 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
         .orient("right");
 
     var lines = [];
+    var sunAreas = [];
     if (drawSunrise) {
       lines.push(makeSunLine(function(d) { return d.official_sunrise; }));
+      sunAreas.push(makeSunArea(true, function(d) { return d.official_sunrise; }));
     }
     if (drawSunset) {
       lines.push(makeSunLine(function(d) { return d.official_sunset; }));
+      sunAreas.push(makeSunArea(false, function(d) { return d.official_sunset; }));
     }
 
     var areas = [];
@@ -211,6 +231,13 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
           .tickSize(-width, 0, 0)
           .tickFormat("")
       )
+
+    sunAreas.forEach(function(area) {
+      svg.append("path")
+          .datum(data)
+          .attr("class", "sunArea")
+          .attr("d", area);
+    });
 
     if (showBottomXAxis) {
       svg.append("g")

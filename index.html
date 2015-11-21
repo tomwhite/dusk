@@ -271,7 +271,7 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
             .attr("y", 8)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
-            .text("Hour");
+            .text("Hour (GMT)");
     }
 
     svg.append("g")
@@ -289,7 +289,7 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       .attr("x2", x(summerSolstice.date))
       .attr("y2", chartHeight);
     svg.append("text")
-      .attr("transform", "translate(" + (x(summerSolstice.date) + 5) + "," + (y(summerSolstice.official_sunrise) + 5) + ") rotate(-90)")
+      .attr("transform", "translate(" + (x(summerSolstice.date) + 5) + "," + (y(summerSolstice.official_sunrise) + 10) + ") rotate(-90)")
       .attr("dy", ".71em")
       .attr("text-anchor", "end")
       .text("Longest day " + formatDateMonth.call(undefined, summerSolstice.date));
@@ -301,9 +301,9 @@ function draw(svg, chartHeight, data, drawSunrise, drawSunset, showTopXAxis, sho
       .attr("x2", x(winterSolstice.date))
       .attr("y2", chartHeight);
     svg.append("text")
-      .attr("transform", "translate(" + (x(winterSolstice.date) + 5) + "," + (y(winterSolstice.official_sunrise) + 5) + ") rotate(-90)")
+      .attr("transform", "translate(" + (x(winterSolstice.date) + 5) + "," + (y(winterSolstice.official_sunrise)) + ") rotate(-90)")
       .attr("dy", ".71em")
-      .attr("text-anchor", "end")
+      .attr("text-anchor", "start")
       .text("Shortest day " + formatDateMonth.call(undefined, winterSolstice.date));
 
     lines.forEach(function(line) {

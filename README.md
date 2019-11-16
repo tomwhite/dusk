@@ -2,6 +2,9 @@ A program to plot the time of [dusk](https://en.wikipedia.org/wiki/Dusk) over th
 Earth's surface. Curves for official (0° below horizon), civil (6°), nautical (12°), and astronomical (18°) dusk are
 shown.
 
+**November 2019 update: the United States Naval Observatory site used for sunrise and sunset data has been taken down until
+April 2020, see https://www.researchgate.net/post/What_has_happened_to_wwwusnonavymil**
+
 To run, first generate a data file as follows (you will need to change the lat/long parameters for other locations):
 
 ```bash
